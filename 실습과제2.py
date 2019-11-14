@@ -1,37 +1,25 @@
 import numpy as np
 
-def component_swap(matrix, index1, index2, column):
-    temp = matrix[index1][index2]
-    matrix[index1][index2] = matrix[column][index2]
-    matrix[column][index2] = temp
-    return matrix
 
 def pivot_matrix(matrix, N):
-    identity_matrix = np.zeros((N, N))
+    identity_matrix = [[0 for i in range(0, N)] for j in range(0, N)]
     for i in range(0, N):
         for j in range(0, N):
             if i == j:
                 identity_matrix[i][j] = 1
+
     for j in range(0, N):
         row = max(range(j, N), key=lambda i: matrix[i][j])
         if j != row:
             identity_matrix[j], identity_matrix[row] \
                 = identity_matrix[row], identity_matrix[j]
-    print(identity_matrix)
+    return identity_matrix
 
-def LU(A, N):
+def LU(matrix, N):
     #벡터 x, y, b선언 (모두 0으로 초기화된 N차원 벡터들)
-    vector_x = [0 for i in range(N)]
-    vector_y = [0 for i in range(N)]
-    vector_b = [0 for i in range(N)]
-
-    # 벡터b는 행렬L과 벡터 y를 곱했을때 나오는 벡터
-    # 행렬A의 마지막 column을 벡터b로 지정한다.
-    for i in range(0, 3):
-        vector_b[i] = A[i][N-1]
 
     # L행렬의 대각선 원소들은 1이다.
-    lower_triangle = np.zeros((N, N))
+    lower_triangle = [[0 for i in range(0, N)] for i in range(0, N)]
     for i in range(0, N):
         lower_triangle[i][i] = 1    #인덱스가 같으면 diagonal component
 
@@ -39,23 +27,23 @@ def LU(A, N):
     upper_triangle = np.zeros((N, N))
     for i in range(0, N):
         for j in range(0, N):
-            upper_triangle[i][j] = A[i][j]
+            upper_triangle[i][j] = matrix[i][j]
 
-    for i in range(0, N):
-        # LU factorization전에 줄바꾸기 (row swap)실행
-
-        max_element = upper_triangle[i][i]   #일단은 맨 첫 원소로 지정후 비교한다
+    for i in range(0, N):   #인덱스 i는 행(row)
+        max_component = abs(upper_triangle[i][i])   #일단은 맨 첫 원소로 지정후 비교한다
         max_row = i #최대 행 역시 맨 처음 행으로 지정해둔다
-        for k in range(i + 1, N):   #그 다음 행
-            if max_element < upper_triangle[k][i]:
-                max_element = max(upper_triangle[k][i], max_element) # Next line on the diagonal
+        for k in range(i + 1, N):   #그 다음 행(i+1)과 비교
+            if max_component < abs(upper_triangle[k][i]):
+                max_component = abs(upper_triangle[k][i]) # Next line on the diagonal
                 max_row = k #최대값이 있는 행 갱신(k번째 행과 i번째(현재 기준 행)비교
 
         # N개의 행 중 가장 큰 원소값이 맨 첫 행으로 오게 swap연산을 한다
         #i는 현재 행을 나타낸다(전체반복문 인덱스)
         for k in range(i, N):
             # i번째 행의 성분들과 k번째 행의 성분들을 하나씩 바꿔치기해준다
-            component_swap(upper_triangle, max_row, k, i)
+            temp = upper_triangle[max_row][k]
+            upper_triangle[max_row][k] = upper_triangle[i][k]
+            upper_triangle[i][k] = temp
 
         #multiple을 구해 pivot행의 component를 곱한 값을 그 밑 행의 component들과 더한다(+=)
         for k in range(i + 1, N):
@@ -70,12 +58,21 @@ def LU(A, N):
         for k in range(i + 1, N):
             upper_triangle[k][i] = 0
 
+    vector_b = [0 for i in range(0, N)]
+    # 벡터b는 행렬L과 벡터 y를 곱했을때 나오는 벡터
+    # 행렬A의 마지막 column을 벡터b로 지정한다.
+    for i in range(0, N):
+        vector_b[i] = matrix[i][N-1]
+
+    vector_y = [0 for i in range(0, N)]
     #lower triangle의 행렬 L과 벡터y를 곱하면 b벡터가 나오기때문에
     #그 성질을 이용하여 성분들의 연산을 해준다
-    for i in range(0, N, 1):
+    for i in range(0, N):
         vector_y[i] = vector_b[i] / float(lower_triangle[i][i])
-        for k in range(0, i, 1):
+        for k in range(0, i):
             vector_y[i] -= vector_y[k] * lower_triangle[i][k]
+
+    vector_x = [0  for i in range(0, N)]
     #upper triangle의 행렬 U과 벡터x를 곱하면 벡터y가 나오므로
     #그 성질을 이용해 성분연산
     for i in range(N - 1, -1, -1):  #for(int i = N-1; i>=0;i--) 거꾸로
@@ -89,7 +86,7 @@ def main():
     print("정방행렬 N * N matrix 입니다.")
     N = int(input("N을 입력하세요: "))
 
-    matrix = np.zeros((N, N))
+    matrix = [[0 for i in range(0, N)] for j in range(0, N)]
 
     print("\n행-열 순으로 입력해주세요.\n"
           "(각 입력마다 엔터 키로 구분이 됩니다.)\n"
@@ -104,11 +101,17 @@ def main():
     #upper_triangle = [[0] * N for i in range(N)]
 
     print("Initial Matrix A:")
-    print(matrix, '\n')
-    print("Lower and Upper Triangle:")
+    for row in matrix:
+        print(row)
+
+    print("\nLower and Upper Triangle:")
     for part in LU(matrix, N):
-        print(part, '\n')
+        print('\t')
+        for sub_part in part:
+            print(sub_part)
+
     print("\nPermutation:")
-    pivot_matrix(matrix, N)
+    for row in pivot_matrix(matrix, N):
+        print(row)
 
 main()
