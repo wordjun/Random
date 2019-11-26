@@ -1,6 +1,9 @@
 from sympy import Symbol, solve
 import numpy as np
 
+def row_echelon_form(matrix, N):
+
+
 def swap(matrix, idx1, idx2, idx3):
     temp = matrix[idx1][idx3]
     matrix[idx1][idx3] = matrix[idx2][idx3]
@@ -94,6 +97,7 @@ def diagonalization(matrix, N):
             temp_matrix1[i][j] = P_matrix[i][j]
     for j in range(0, N):
         temp_matrix1[j][j] -= eigenvalues[0]
+    row_echelon_form(temp_matrix1, N)
     print(temp_matrix1)
 
     temp_matrix2 = np.zeros((N, N))
@@ -102,6 +106,7 @@ def diagonalization(matrix, N):
             temp_matrix2[i][j] = P_matrix[i][j]
     for j in range(0, N):
         temp_matrix2[j][j] -= eigenvalues[1]
+    row_echelon_form(temp_matrix2, N)
     print(temp_matrix2)
     '''
     P_inverse = np.zeros((N, N))
