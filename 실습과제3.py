@@ -2,7 +2,41 @@ from sympy import Symbol, solve
 import numpy as np
 
 def row_echelon_form(matrix, N):
+    #calculate
+    for k in range(0, N-1):
+        for i in range(k, N-1):
+            temp = 0 #column index
 
+            # first and second number for calculating multiplier
+            first_num = matrix[k][temp]
+            if matrix[i+1][temp] != 0:
+                second_num = matrix[i+1][temp]
+            else:
+                if k == 0:
+                    k += 1
+                first_num = matrix[k][temp+1]
+                second_num = matrix[i+1][temp+1]
+
+            #set multiplier
+            if first_num == 0 or second_num == 0:
+                multiplier = 0
+            else:
+                multiplier = (-second_num) / first_num
+
+            #temporary number for multiplication then addition
+            temp_num = 0
+            for j in range(0, N):
+                temp_num = matrix[k][j] * multiplier  # multiply temp_row
+                matrix[i+1][j] += temp_num  # then add it to the next row
+    return matrix
+
+
+def calculate_vector(matrix, N):
+    #span으로 나타낼 벡터 찾기
+    # 벡터의 마지막 원소를 t로 두고 계산
+    vector = np.zeros((N, N))
+    t = Symbol('t')
+    
 
 def swap(matrix, idx1, idx2, idx3):
     temp = matrix[idx1][idx3]
@@ -106,7 +140,8 @@ def diagonalization(matrix, N):
             temp_matrix2[i][j] = P_matrix[i][j]
     for j in range(0, N):
         temp_matrix2[j][j] -= eigenvalues[1]
-    row_echelon_form(temp_matrix2, N)
+    row_echelon_form(temp_matrix2, N)   #이 함수를 통해 행렬을 rref시킨 후 벡터로 표현
+
     print(temp_matrix2)
     '''
     P_inverse = np.zeros((N, N))
