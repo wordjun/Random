@@ -184,23 +184,25 @@ def diagonalization(matrix, N, original_matrix):
 
 
 def main():
-    '''
+
     print("정방행렬 N * N matrix 입니다.")
     N = int(input("N을 입력하세요: "))
 
     # N*N 행렬 생성.
     matrix = [[0 for i in range(0, N)] for j in range(0, N)]
-
+    original_matrix = [[0 for i in range(0, N)] for j in range(0, N)]
     print("\n행-열 순으로 입력해주세요.\n"
     "(각 입력마다 엔터 키로 구분이 됩니다.)\n"
     "1행 1열부터 입력을 시작합니다.\n")
 
     # 정방향 행렬을 입력받는 부분입니다.
     for i in range(0, N): # row
-    for j in range(0, N): # column
-    matrix[i][j] = int(input("row %d, column %d: " % (i + 1, j + 1)))
-    '''
+        for j in range(0, N): # column
+            matrix[i][j] = int(input("row %d, column %d: " % (i + 1, j + 1)))
+            original_matrix[i][j] = matrix[i][j]
+
     #test case
+    '''
     matrix = [[1,2,1,],
                 [6,-1,0],
                 [-1,-2,-1]]
@@ -208,7 +210,10 @@ def main():
     original_matrix = [[1,2,1,],
                         [6,-1,0],
                         [-1,-2,-1]]
+    '''
+    #D행렬 계산(대각화 함수 호출)
     D_matrix = diagonalization(matrix, N, original_matrix)
+
     # 입력받은 행렬을 diagonalization 함수로 보냅니다.
     print("\nD 행렬")
     for part in D_matrix:
